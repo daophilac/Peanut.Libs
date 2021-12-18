@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>Peanut.Libs.Game</AssemblyName>
+    <RootNamespace>Peanut.Libs.Game</RootNamespace>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Specialized\Specialized.csproj" />
+  </ItemGroup>
+
+</Project>
