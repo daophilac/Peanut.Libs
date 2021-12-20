@@ -7,6 +7,11 @@ namespace Peanut.Libs.Wpf {
     /// </summary>
     public abstract class EditableBase : BindableBase, IEditableObject {
         /// <summary>
+        /// Gets a value indicating whether this object is in edit mode.<br/>
+        /// </summary>
+        public bool InEdit { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="EditableBase"/> class.<br/>
         /// </summary>
         public EditableBase() {
@@ -15,17 +20,16 @@ namespace Peanut.Libs.Wpf {
 
         #region IEditableObject implementation
         private EditableBase backupCopy;
-        private bool inEdit;
 
         /// <summary>
         /// Begins editing the object.<br/>
         /// This method internally calls the <see cref="BeginEdit"/> method.<br/>
         /// </summary>
         void IEditableObject.BeginEdit() {
-            if (inEdit) {
+            if (InEdit) {
                 return;
             }
-            inEdit = true;
+            InEdit = true;
             backupCopy = (EditableBase)MemberwiseClone();
             BeginEdit(backupCopy);
         }
@@ -35,10 +39,10 @@ namespace Peanut.Libs.Wpf {
         /// This method internally calls the <see cref="CancelEdit"/> method.<br/>
         /// </summary>
         void IEditableObject.CancelEdit() {
-            if (!inEdit) {
+            if (!InEdit) {
                 return;
             }
-            inEdit = false;
+            InEdit = false;
             CancelEdit(backupCopy);
         }
 
@@ -47,10 +51,10 @@ namespace Peanut.Libs.Wpf {
         /// This method internally calls the <see cref="EndEdit"/> method.<br/>
         /// </summary>
         void IEditableObject.EndEdit() {
-            if (!inEdit) {
+            if (!InEdit) {
                 return;
             }
-            inEdit = false;
+            InEdit = false;
             EndEdit(backupCopy);
         }
         #endregion

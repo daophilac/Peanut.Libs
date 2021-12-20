@@ -1,6 +1,8 @@
-﻿using Peanut.Libs.Specialized.Reflection;
+﻿using Peanut.Libs.Extensions;
+using Peanut.Libs.Specialized.Reflection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,9 +14,28 @@ namespace Peanut.Libs.Wpf {
     /// </summary>
     public abstract class Subscriber {
         /// <summary>
-        /// Gets whether the subscriber is still alive.
+        /// Gets a value indicating whether the subscriber is still alive.<br/>
         /// </summary>
         protected internal abstract bool IsAlive { get; }
+
+        /// <summary>
+        /// Gets the type of the subscriber.<br/>
+        /// </summary>
+        public Type SubscriberType { get; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Subscriber"/> class.<br/>
+        /// </summary>
+        public Subscriber() {
+            SubscriberType = Diagnostics.GetTypeOfCallingClass(4);
+        }
+
+        /// <inheritdoc/>
+        public override string? ToString() {
+            return SubscriberType == null ?
+                base.ToString() :
+                $"{base.ToString()}: {SubscriberType}";
+        }
     }
 
     /// <summary>
@@ -384,13 +405,6 @@ namespace Peanut.Libs.Wpf {
         /// </summary>
         protected readonly HashSet<TSubscriber> Subscribers = new();
 
-        /// <summary>
-        /// The copied list of all the subscribers used for enumeration.<br/>
-        /// This list helps avoiding deadlock when the publishing indirectly calls the subscribe
-        /// method.<br/>
-        /// </summary>
-        protected readonly List<TSubscriber> SubscribersForEnumeration = new();
-
         /// <inheritdoc/>
         public override int SubscribersCount => Subscribers.Count;
 
@@ -409,10 +423,7 @@ namespace Peanut.Libs.Wpf {
         /// Removes all the dead subscribers.<br/>
         /// </summary>
         protected void RemoveDeadSubscribers_UnderLock() {
-            int count = Subscribers.RemoveWhere(x => !x.IsAlive);
-            if (count != 0) {
-                SubscribersForEnumeration.RemoveAll(x => !x.IsAlive);
-            }
+            Subscribers.RemoveWhere(x => !x.IsAlive);
         }
 
         /// <summary>
@@ -421,7 +432,6 @@ namespace Peanut.Libs.Wpf {
         /// <param name="subscriber">The subscriber to be added.</param>
         protected void AddSubscriber(TSubscriber subscriber) {
             Subscribers.Add(subscriber);
-            SubscribersForEnumeration.Add(subscriber);
         }
 
         /// <summary>
@@ -430,7 +440,6 @@ namespace Peanut.Libs.Wpf {
         /// <param name="subscriber">The subscriber to be removed.</param>
         protected void RemoveSubscriber(TSubscriber subscriber) {
             Subscribers.Remove(subscriber);
-            SubscribersForEnumeration.Remove(subscriber);
         }
 
         /// <summary>
@@ -505,23 +514,63 @@ namespace Peanut.Libs.Wpf {
 
         /// <inheritdoc/>
         public override void Publish() {
+            Publish(new());
+        }
+
+        private void Publish(HashSet<ParameterlessSubscriberBase> publishedSubscribers) {
             semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            int count = SubscribersForEnumeration.Count;
+            List<ParameterlessSubscriberBase> subscribers;
+            if (!publishedSubscribers.Any()) {
+                subscribers = new(Subscribers);
+            }
+            else {
+                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+            }
+            int count = subscribers.Count;
             semaphore.Release();
             for (int i = 0; i < count; i++) {
-                SubscribersForEnumeration[i].Publish();
+                ParameterlessSubscriberBase subscriber = subscribers[i];
+                subscriber.Publish();
+                publishedSubscribers.Add(subscriber);
+
+                // There are scenarios when the subscriber unsubscribes one or more tokens.
+                // In that case, the for loop variable could run out of the length of the list.
+                if (count != subscribers.Count) {
+                    Publish(publishedSubscribers);
+                    return;
+                }
             }
         }
 
         /// <inheritdoc/>
         public override async Task PublishAsync() {
-            await semaphore.WaitAsync();
+            await PublishAsync(new()).ConfigureAwait(false);
+        }
+
+        private async Task PublishAsync(HashSet<ParameterlessSubscriberBase> publishedSubscribers) {
+            semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            int count = SubscribersForEnumeration.Count;
+            List<ParameterlessSubscriberBase> subscribers;
+            if (!publishedSubscribers.Any()) {
+                subscribers = new(Subscribers);
+            }
+            else {
+                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+            }
+            int count = subscribers.Count;
             semaphore.Release();
             for (int i = 0; i < count; i++) {
-                await SubscribersForEnumeration[i].PublishAsync().ConfigureAwait(false);
+                ParameterlessSubscriberBase subscriber = subscribers[i];
+                await subscriber.PublishAsync().ConfigureAwait(false);
+                publishedSubscribers.Add(subscriber);
+
+                // There are scenarios when the subscriber unsubscribes one or more tokens.
+                // In that case, the for loop variable could run out of the length of the list.
+                if (count != subscribers.Count) {
+                    await PublishAsync(publishedSubscribers).ConfigureAwait(false);
+                    return;
+                }
             }
         }
     }
@@ -547,23 +596,67 @@ namespace Peanut.Libs.Wpf {
 
         /// <inheritdoc/>
         public override void Publish(TParam payload) {
+            Publish(payload, new());
+        }
+
+        private void Publish(
+            TParam payload,
+            HashSet<ParameteredSubscriberBase<TParam>> publishedSubscribers) {
             semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            int count = SubscribersForEnumeration.Count;
+            List<ParameteredSubscriberBase<TParam>> subscribers;
+            if (!publishedSubscribers.Any()) {
+                subscribers = new(Subscribers);
+            }
+            else {
+                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+            }
+            int count = subscribers.Count;
             semaphore.Release();
             for (int i = 0; i < count; i++) {
-                SubscribersForEnumeration[i].Publish(payload);
+                ParameteredSubscriberBase<TParam> subscriber = subscribers[i];
+                subscriber.Publish(payload);
+                publishedSubscribers.Add(subscriber);
+
+                // There are scenarios when the subscriber unsubscribes one or more tokens.
+                // In that case, the for loop variable could run out of the length of the list.
+                if (count != subscribers.Count) {
+                    Publish(payload, publishedSubscribers);
+                    return;
+                }
             }
         }
 
         /// <inheritdoc/>
         public override async Task PublishAsync(TParam payload) {
-            await semaphore.WaitAsync();
+            await PublishAsync(payload, new()).ConfigureAwait(false);
+        }
+
+        private async Task PublishAsync(
+            TParam payload,
+            HashSet<ParameteredSubscriberBase<TParam>> publishedSubscribers) {
+            semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            int count = SubscribersForEnumeration.Count;
+            List<ParameteredSubscriberBase<TParam>> subscribers;
+            if (!publishedSubscribers.Any()) {
+                subscribers = new(Subscribers);
+            }
+            else {
+                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+            }
+            int count = subscribers.Count;
             semaphore.Release();
             for (int i = 0; i < count; i++) {
-                await SubscribersForEnumeration[i].PublishAsync(payload).ConfigureAwait(false);
+                ParameteredSubscriberBase<TParam> subscriber = subscribers[i];
+                await subscriber.PublishAsync(payload).ConfigureAwait(false);
+                publishedSubscribers.Add(subscriber);
+
+                // There are scenarios when the subscriber unsubscribes one or more tokens.
+                // In that case, the for loop variable could run out of the length of the list.
+                if (count != subscribers.Count) {
+                    await PublishAsync(payload, publishedSubscribers).ConfigureAwait(false);
+                    return;
+                }
             }
         }
     }
