@@ -78,5 +78,19 @@ namespace Peanut.Libs.Wpf {
             }
             base.OnPropertyChanged(e);
         }
+
+        /// <summary>
+        /// Performs the specified action on each element of the
+        /// <see cref="SupressableObservableCollection{T}"/>.<br/>
+        /// </summary>
+        /// <param name="action">
+        ///     The action delegate to perform on each element of the
+        ///     <see cref="SupressableObservableCollection{T}"/>.
+        /// </param>
+        public void ForEach(Action<T> action) {
+            foreach (T item in this) {
+                action(item);
+            }
+        }
     }
 }
