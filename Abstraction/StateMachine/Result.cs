@@ -11,14 +11,16 @@ namespace Peanut.Libs.Abstraction.StateMachine {
         public bool Success { get; protected set; }
 
         /// <summary>
-        /// Gets the error (if any) in case <see cref="Success"/> is <code>false</code>
+        /// Gets the error (if any) in case <see cref="Success"/> is <see langword="false"/>
         /// </summary>
         public Error? Error { get; protected set; }
 
         /// <summary>
         /// A protected constructor that assigns value to the <see cref="Success"/> property.
         /// </summary>
-        /// <param name="success">A value that gets assigned to the <see cref="Success"/> property.</param>
+        /// <param name="success">
+        ///     A value that gets assigned to the <see cref="Success"/> property.
+        /// </param>
         protected Result(bool success) {
             Success = success;
         }
@@ -208,8 +210,8 @@ namespace Peanut.Libs.Abstraction.StateMachine {
         }
 
         /// <summary>
-        /// Initializes an instance of the <see cref="Error"/> class that sets a value
-        /// for <see cref="Message"/> property, a value for the <see cref="Code"/> property
+        /// Initializes a new instance of the <see cref="Error"/> class that sets a value
+        /// for the <see cref="Message"/> property, a value for the <see cref="Code"/> property
         /// and a value for the <see cref="Exception"/> property.
         /// </summary>
         /// <param name="message">A message used to describe the error.</param>

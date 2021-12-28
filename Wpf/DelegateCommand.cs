@@ -120,11 +120,13 @@ namespace Peanut.Libs.Wpf {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        void ICommand.Execute(object? parameter) {
+        /// <inheritdoc/>
+        public void Execute(object? parameter) {
             executeStrategy?.Execute(parameter);
         }
 
-        bool ICommand.CanExecute(object? parameter) {
+        /// <inheritdoc/>
+        public bool CanExecute(object? parameter) {
             return canExecuteStrategy != null && canExecuteStrategy.CanExecute(parameter);
         }
     }

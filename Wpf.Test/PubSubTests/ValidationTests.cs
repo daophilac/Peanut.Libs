@@ -126,15 +126,15 @@ namespace Wpf.Test.PubSubTests {
         [Test]
         public void CountSubscribers() {
             InstanceVoidPubSub @event = ea.GetEvent<InstanceVoidPubSub>();
-            Assert.AreEqual(0, @event.SubscribersCount);
+            Assert.AreEqual(0, @event.Subscribers.Count());
             Class1 class1 = new(ea);
-            Assert.AreEqual(1, @event.SubscribersCount);
+            Assert.AreEqual(1, @event.Subscribers.Count());
             Class2 class2 = new(ea);
-            Assert.AreEqual(2, @event.SubscribersCount);
+            Assert.AreEqual(2, @event.Subscribers.Count());
             @event.Publish();
-            Assert.AreEqual(2, @event.SubscribersCount);
+            Assert.AreEqual(2, @event.Subscribers.Count());
             DuplicateClass duplicateClass = new(ea);
-            Assert.AreEqual(10, @event.SubscribersCount);
+            Assert.AreEqual(10, @event.Subscribers.Count());
         }
 
         [Test]
@@ -195,18 +195,18 @@ namespace Wpf.Test.PubSubTests {
         public void Unsubscribe() {
             UnsubscribeVoidPubSub event1 = ea.GetEvent<UnsubscribeVoidPubSub>();
             UnsubscribeParamPubSub event2 = ea.GetEvent<UnsubscribeParamPubSub>();
-            Assert.AreEqual(0, event1.SubscribersCount);
-            Assert.AreEqual(0, event2.SubscribersCount);
+            Assert.AreEqual(0, event1.Subscribers.Count());
+            Assert.AreEqual(0, event2.Subscribers.Count());
             SubscriptionToken token1 = event1.Subscribe(() => { Console.WriteLine("Anonymous called!"); });
             SubscriptionToken token2 = event2.Subscribe(message => { Console.WriteLine(message); });
-            Assert.AreEqual(1, event1.SubscribersCount);
-            Assert.AreEqual(1, event2.SubscribersCount);
+            Assert.AreEqual(1, event1.Subscribers.Count());
+            Assert.AreEqual(1, event2.Subscribers.Count());
             event1.Publish();
             event2.Publish("Helloooooo");
             token1.Dispose();
             token2.Dispose();
-            Assert.AreEqual(0, event1.SubscribersCount);
-            Assert.AreEqual(0, event2.SubscribersCount);
+            Assert.AreEqual(0, event1.Subscribers.Count());
+            Assert.AreEqual(0, event2.Subscribers.Count());
             event1.Publish();
             event2.Publish("Helloooooo again");
         }
@@ -216,18 +216,18 @@ namespace Wpf.Test.PubSubTests {
             GarbageCollecedPubSub event1 = ea.GetEvent<GarbageCollecedPubSub>();
             WeakReference weakReference = null;
             new Action(() => {
-                Assert.AreEqual(0, event1.SubscribersCount);
+                Assert.AreEqual(0, event1.Subscribers.Count());
                 GarbageCollectedInstanceClass instanceClass = new(ea);
                 weakReference = new WeakReference(instanceClass);
-                Assert.AreEqual(1, event1.SubscribersCount);
+                Assert.AreEqual(1, event1.Subscribers.Count());
             })();
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Assert.IsFalse(weakReference.IsAlive);
             Assert.IsNull(weakReference.Target);
-            Assert.AreEqual(1, event1.SubscribersCount);
+            Assert.AreEqual(1, event1.Subscribers.Count());
             event1.Publish();
-            Assert.AreEqual(0, event1.SubscribersCount);
+            Assert.AreEqual(0, event1.Subscribers.Count());
         }
 
         [Test]
@@ -235,18 +235,18 @@ namespace Wpf.Test.PubSubTests {
             GarbageCollecedStaticPubSub event1 = ea.GetEvent<GarbageCollecedStaticPubSub>();
             WeakReference weakReference = null;
             new Action(() => {
-                Assert.AreEqual(0, event1.SubscribersCount);
+                Assert.AreEqual(0, event1.Subscribers.Count());
                 GarbageCollectedStaticClass instanceClass = new(ea);
                 weakReference = new WeakReference(instanceClass);
-                Assert.AreEqual(2, event1.SubscribersCount);
+                Assert.AreEqual(2, event1.Subscribers.Count());
             })();
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Assert.IsFalse(weakReference.IsAlive);
             Assert.IsNull(weakReference.Target);
-            Assert.AreEqual(2, event1.SubscribersCount);
+            Assert.AreEqual(2, event1.Subscribers.Count());
             event1.Publish();
-            Assert.AreEqual(1, event1.SubscribersCount); // not a typo
+            Assert.AreEqual(1, event1.Subscribers.Count()); // not a typo
         }
     }
 }

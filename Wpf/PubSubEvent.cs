@@ -1,5 +1,4 @@
-﻿using Peanut.Libs.Extensions;
-using Peanut.Libs.Specialized.Reflection;
+﻿using Peanut.Libs.Specialized.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,22 +18,28 @@ namespace Peanut.Libs.Wpf {
         protected internal abstract bool IsAlive { get; }
 
         /// <summary>
-        /// Gets the type of the subscriber.<br/>
+        /// Gets the name of the subscriber.<br/>
         /// </summary>
-        public Type SubscriberType { get; }
+        public string? SubscriberName { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Subscriber"/> class.<br/>
         /// </summary>
-        public Subscriber() {
-            SubscriberType = Diagnostics.GetTypeOfCallingClass(4);
+        public Subscriber() { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Subscriber"/> class.<br/>
+        /// </summary>
+        /// <param name="subscriberName"></param>
+        public Subscriber(string? subscriberName) {
+            SubscriberName = subscriberName;
         }
 
         /// <inheritdoc/>
         public override string? ToString() {
-            return SubscriberType == null ?
+            return SubscriberName == null ?
                 base.ToString() :
-                $"{base.ToString()}: {SubscriberType}";
+                $"{base.ToString()}: {SubscriberName}";
         }
     }
 
@@ -42,6 +47,9 @@ namespace Peanut.Libs.Wpf {
     /// Base class for subscribers that do not require a parameter.<br/>
     /// </summary>
     public abstract class ParameterlessSubscriberBase : Subscriber {
+        /// <inheritdoc/>
+        protected ParameterlessSubscriberBase(string? subscriberName) : base(subscriberName) { }
+
         /// <summary>
         /// Publishes the signal to all subscribers.<br/>
         /// </summary>
@@ -66,7 +74,9 @@ namespace Peanut.Libs.Wpf {
         /// Initializes an instance of the <see cref="StaticParameterlessSubscriber"/> class.<br/>
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
-        internal StaticParameterlessSubscriber(Action action) {
+        /// <param name="subscriberName">The name of the subscriber.</param>
+        internal StaticParameterlessSubscriber(Action action, string? subscriberName)
+            : base(subscriberName) {
             this.action = action.Method.CreateStaticVoid();
         }
 
@@ -93,7 +103,9 @@ namespace Peanut.Libs.Wpf {
         /// Initializes an instance of the <see cref="InstanceParameterlessSubscriber"/> class.
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
-        internal InstanceParameterlessSubscriber(Action action) {
+        /// <param name="subscriberName">The name of the subscriber.</param>
+        internal InstanceParameterlessSubscriber(Action action, string? subscriberName)
+            : base(subscriberName) {
             weakReference = new(action.Target);
 #nullable disable
             this.action = action.Method.CreateInstanceVoid(action.Target.GetType());
@@ -119,6 +131,9 @@ namespace Peanut.Libs.Wpf {
     /// </summary>
     /// <typeparam name="TParam">The type of the data being published by the event.</typeparam>
     public abstract class ParameteredSubscriberBase<TParam> : Subscriber {
+        /// <inheritdoc/>
+        protected ParameteredSubscriberBase(string? subscriberName) : base(subscriberName) { }
+
         /// <summary>
         /// Publishes the signal to all subscribers.<br/>
         /// </summary>
@@ -147,7 +162,9 @@ namespace Peanut.Libs.Wpf {
         /// class.<br/>
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
-        internal StaticParameteredSubscriber(Action<TParam> action) {
+        /// <param name="subscriberName">The name of the subscriber.</param>
+        internal StaticParameteredSubscriber(Action<TParam> action, string? subscriberName)
+            : base(subscriberName) {
             this.action = action.Method.CreateStaticVoidParam<TParam>();
         }
 
@@ -175,7 +192,9 @@ namespace Peanut.Libs.Wpf {
         /// Initializes an instance of the <see cref="InstanceParameteredSubscriber{TParam}"/> class.
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
-        internal InstanceParameteredSubscriber(Action<TParam> action) {
+        /// <param name="subscriberName">The name of the subscriber.</param>
+        internal InstanceParameteredSubscriber(Action<TParam> action, string? subscriberName)
+            : base(subscriberName) {
             weakReference = new(action.Target);
 #nullable disable
             this.action = action.Method.CreateInstanceVoidParam<TParam>(action.Target.GetType());
@@ -207,8 +226,10 @@ namespace Peanut.Libs.Wpf {
         /// <paramref name="action"/>.<br/>
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
+        /// <param name="subscriberName">The name of the subscriber.</param>
         /// <returns>A <see cref="ParameterlessSubscriberBase"/> instance.</returns>
-        internal abstract ParameterlessSubscriberBase Instantiate(Action action);
+        internal abstract ParameterlessSubscriberBase Instantiate(Action action,
+            string? subscriberName);
     }
 
     /// <summary>
@@ -221,8 +242,10 @@ namespace Peanut.Libs.Wpf {
         /// <paramref name="action"/>.<br/>
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
+        /// <param name="subscriberName">The name of the subscriber.</param>
         /// <returns>A <see cref="ParameteredSubscriberBase{TParam}"/> instance.</returns>
-        internal abstract ParameteredSubscriberBase<TParam> Instantiate(Action<TParam> action);
+        internal abstract ParameteredSubscriberBase<TParam> Instantiate(Action<TParam> action,
+            string? subscriberName);
     }
 
     /// <summary>
@@ -230,12 +253,13 @@ namespace Peanut.Libs.Wpf {
     /// This class cannot be inherited.<br/>
     /// </summary>
     internal sealed class ParameterlessSubscriberFactory : ParameterlessSubscriberFactoryBase {
-        internal override ParameterlessSubscriberBase Instantiate(Action action) {
+        internal override ParameterlessSubscriberBase Instantiate(Action action,
+            string? subscriberName) {
             if (action.Target is null) { // static method
-                return new StaticParameterlessSubscriber(action);
+                return new StaticParameterlessSubscriber(action, subscriberName);
             }
             else { // instance method
-                return new InstanceParameterlessSubscriber(action);
+                return new InstanceParameterlessSubscriber(action, subscriberName);
             }
         }
     }
@@ -247,12 +271,13 @@ namespace Peanut.Libs.Wpf {
     /// <typeparam name="TParam">The type of the data being published by the event.</typeparam>
     internal sealed class ParameteredSubscriberFactory<TParam> :
         ParameteredSubscriberFactoryBase<TParam> {
-        internal override ParameteredSubscriberBase<TParam> Instantiate(Action<TParam> action) {
+        internal override ParameteredSubscriberBase<TParam> Instantiate(Action<TParam> action,
+            string? subscriberName) {
             if (action.Target is null) { // static method
-                return new StaticParameteredSubscriber<TParam>(action);
+                return new StaticParameteredSubscriber<TParam>(action, subscriberName);
             }
             else { // instance method
-                return new InstanceParameteredSubscriber<TParam>(action);
+                return new InstanceParameteredSubscriber<TParam>(action, subscriberName);
             }
         }
     }
@@ -380,9 +405,9 @@ namespace Peanut.Libs.Wpf {
     /// </summary>
     public abstract class PubSubEventBase {
         /// <summary>
-        /// Gets the total subscribers of this event.<br/>
+        /// Gets all the subscribers of this event.<br/>
         /// </summary>
-        public abstract int SubscribersCount { get; }
+        public abstract IEnumerable<Subscriber> Subscribers { get; }
 
         /// <summary>
         /// Async lock used for ensuring thread-safe.<br/>
@@ -403,10 +428,7 @@ namespace Peanut.Libs.Wpf {
         /// <summary>
         /// Collection of all the subscribers of this event.<br/>
         /// </summary>
-        protected readonly HashSet<TSubscriber> Subscribers = new();
-
-        /// <inheritdoc/>
-        public override int SubscribersCount => Subscribers.Count;
+        protected readonly HashSet<TSubscriber> subscribers = new();
 
         /// <summary>
         /// Removes all the dead subscribers.<br/>
@@ -423,7 +445,7 @@ namespace Peanut.Libs.Wpf {
         /// Removes all the dead subscribers.<br/>
         /// </summary>
         protected void RemoveDeadSubscribers_UnderLock() {
-            Subscribers.RemoveWhere(x => !x.IsAlive);
+            subscribers.RemoveWhere(x => !x.IsAlive);
         }
 
         /// <summary>
@@ -431,7 +453,7 @@ namespace Peanut.Libs.Wpf {
         /// </summary>
         /// <param name="subscriber">The subscriber to be added.</param>
         protected void AddSubscriber(TSubscriber subscriber) {
-            Subscribers.Add(subscriber);
+            subscribers.Add(subscriber);
         }
 
         /// <summary>
@@ -439,17 +461,18 @@ namespace Peanut.Libs.Wpf {
         /// </summary>
         /// <param name="subscriber">The subscriber to be removed.</param>
         protected void RemoveSubscriber(TSubscriber subscriber) {
-            Subscribers.Remove(subscriber);
+            subscribers.Remove(subscriber);
         }
 
         /// <summary>
         /// Subscribes for signal from this event.<br/>
         /// </summary>
         /// <param name="action">The event delegate of the subscriber.</param>
+        /// <param name="subscriberName">The name of the subscriber.</param>
         /// <returns>
         ///     A <see cref="SubscriptionToken"/> that can be used to unsubscribe the event.
         /// </returns>
-        public abstract SubscriptionToken Subscribe(TAction action);
+        public abstract SubscriptionToken Subscribe(TAction action, string? subscriberName = null);
     }
 
     /// <summary>
@@ -498,13 +521,16 @@ namespace Peanut.Libs.Wpf {
     /// A pubsub event where the publishers and the subscribers do not require a parameter.<br/>
     /// </summary>
     public class PubSubEvent : ParameterlessPubSubEventBase {
-        private readonly ParameterlessSubscriberFactory subscribersFactory = new();
+        private readonly ParameterlessSubscriberFactory factory = new();
 
         /// <inheritdoc/>
-        public override SubscriptionToken Subscribe(Action action) {
+        public override IEnumerable<Subscriber> Subscribers => new List<Subscriber>(subscribers);
+
+        /// <inheritdoc/>
+        public override SubscriptionToken Subscribe(Action action, string? subscriberName = null) {
             semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            ParameterlessSubscriberBase subscriber = subscribersFactory.Instantiate(action);
+            ParameterlessSubscriberBase subscriber = factory.Instantiate(action, subscriberName);
             AddSubscriber(subscriber);
             semaphore.Release();
             return new ParameterlessSubscriptionToken(
@@ -522,10 +548,10 @@ namespace Peanut.Libs.Wpf {
             RemoveDeadSubscribers_UnderLock();
             List<ParameterlessSubscriberBase> subscribers;
             if (!publishedSubscribers.Any()) {
-                subscribers = new(Subscribers);
+                subscribers = new(base.subscribers);
             }
             else {
-                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+                subscribers = new(base.subscribers.Where(x => !publishedSubscribers.Contains(x)));
             }
             int count = subscribers.Count;
             semaphore.Release();
@@ -553,10 +579,10 @@ namespace Peanut.Libs.Wpf {
             RemoveDeadSubscribers_UnderLock();
             List<ParameterlessSubscriberBase> subscribers;
             if (!publishedSubscribers.Any()) {
-                subscribers = new(Subscribers);
+                subscribers = new(base.subscribers);
             }
             else {
-                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+                subscribers = new(base.subscribers.Where(x => !publishedSubscribers.Contains(x)));
             }
             int count = subscribers.Count;
             semaphore.Release();
@@ -580,13 +606,17 @@ namespace Peanut.Libs.Wpf {
     /// </summary>
     /// <typeparam name="TParam">The type of the data being published by the event.</typeparam>
     public class PubSubEvent<TParam> : ParameteredPubSubEventBase<TParam> {
-        private readonly ParameteredSubscriberFactory<TParam> subscribersFactory = new();
+        private readonly ParameteredSubscriberFactory<TParam> factory = new();
 
         /// <inheritdoc/>
-        public override SubscriptionToken Subscribe(Action<TParam> action) {
+        public override IEnumerable<Subscriber> Subscribers => new List<Subscriber>(subscribers);
+
+        /// <inheritdoc/>
+        public override SubscriptionToken Subscribe(Action<TParam> action,
+            string? subscriberName = null) {
             semaphore.Wait();
             RemoveDeadSubscribers_UnderLock();
-            ParameteredSubscriberBase<TParam> subscriber = subscribersFactory.Instantiate(action);
+            ParameteredSubscriberBase<TParam> subscriber = factory.Instantiate(action, subscriberName);
             AddSubscriber(subscriber);
             semaphore.Release();
             return new ParameteredSubscriptionToken<TParam>(
@@ -606,10 +636,10 @@ namespace Peanut.Libs.Wpf {
             RemoveDeadSubscribers_UnderLock();
             List<ParameteredSubscriberBase<TParam>> subscribers;
             if (!publishedSubscribers.Any()) {
-                subscribers = new(Subscribers);
+                subscribers = new(base.subscribers);
             }
             else {
-                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+                subscribers = new(base.subscribers.Where(x => !publishedSubscribers.Contains(x)));
             }
             int count = subscribers.Count;
             semaphore.Release();
@@ -639,10 +669,10 @@ namespace Peanut.Libs.Wpf {
             RemoveDeadSubscribers_UnderLock();
             List<ParameteredSubscriberBase<TParam>> subscribers;
             if (!publishedSubscribers.Any()) {
-                subscribers = new(Subscribers);
+                subscribers = new(base.subscribers);
             }
             else {
-                subscribers = new(Subscribers.Where(x => !publishedSubscribers.Contains(x)));
+                subscribers = new(base.subscribers.Where(x => !publishedSubscribers.Contains(x)));
             }
             int count = subscribers.Count;
             semaphore.Release();
