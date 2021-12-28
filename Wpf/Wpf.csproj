@@ -10,7 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Extensions\Extensions.csproj" />
     <ProjectReference Include="..\Specialized\Specialized.csproj" />
   </ItemGroup>
 
