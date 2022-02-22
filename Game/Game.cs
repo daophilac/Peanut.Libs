@@ -95,8 +95,7 @@ namespace Peanut.Libs.Game {
                 inactiveSleepTime = value;
             }
         }
-        //private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(0.02);
-        private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(10);
+        private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(0.02);
 
         private Stopwatch? gameTimer;
         private readonly GameTime gameTime = new();
