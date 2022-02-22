@@ -13,7 +13,11 @@ namespace Peanut.Libs.Game {
         /// When set to true the target time between frames is
         /// given by <see cref="TargetElapsedTime"/>.
         /// </summary>
-        public bool IsFixedTimeStep { get; set; } = true;
+        public bool IsFixedTimeStep {
+            get => isFixedTimeStep;
+            set => isFixedTimeStep = value;
+        }
+        private bool isFixedTimeStep = true;
 
         /// <summary>
         /// The time between frames when running with a fixed time step.
@@ -23,7 +27,7 @@ namespace Peanut.Libs.Game {
         ///     Target elapsed time must be strictly larger than zero.
         /// </exception>
         public TimeSpan TargetElapsedTime {
-            get { return targetElapsedTime; }
+            get => targetElapsedTime;
             set {
                 if (value <= TimeSpan.Zero) {
                     throw new ArgumentOutOfRangeException(
@@ -49,7 +53,7 @@ namespace Peanut.Libs.Game {
         /// MonoGame extension.
         /// </summary>
         public TimeSpan MaxElapsedTime {
-            get { return maxElapsedTime; }
+            get => maxElapsedTime;
             set {
                 if (value < TimeSpan.Zero) {
                     throw new ArgumentOutOfRangeException(
@@ -70,13 +74,17 @@ namespace Peanut.Libs.Game {
         /// <summary>
         /// Indicates if the game is the focused application.
         /// </summary>
-        public bool IsActive { get; set; } = true;
+        public bool IsActive {
+            get => isActive;
+            set => isActive = value;
+        }
+        private bool isActive = true;
 
         /// <summary>
         /// Gets or sets the duration of sleep when the game is inactive.<br/>
         /// </summary>
         public TimeSpan InactiveSleepTime {
-            get { return inactiveSleepTime; }
+            get => inactiveSleepTime;
             set {
                 if (value < TimeSpan.Zero) {
                     throw new ArgumentOutOfRangeException(
@@ -87,7 +95,8 @@ namespace Peanut.Libs.Game {
                 inactiveSleepTime = value;
             }
         }
-        private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(0.02);
+        //private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(0.02);
+        private TimeSpan inactiveSleepTime = TimeSpan.FromSeconds(10);
 
         private Stopwatch? gameTimer;
         private readonly GameTime gameTime = new();
@@ -98,7 +107,7 @@ namespace Peanut.Libs.Game {
         private bool shouldExit;
 
         /// <summary>
-        /// Runs the game using the default <see cref="GameRunBehavior"/> for the current platform.
+        /// Runs the game using the default <see cref="GameRunBehavior"/> for the current platform.<br/>
         /// </summary>
         public void Run() {
             Run(GameRunBehavior.Synchronous);
@@ -112,7 +121,7 @@ namespace Peanut.Libs.Game {
         }
 
         /// <summary>
-        /// Exit the game at the end of this tick.
+        /// Exits the game at the end of this tick.<br/>
         /// </summary>
         public void Exit() {
             shouldExit = true;
@@ -120,7 +129,7 @@ namespace Peanut.Libs.Game {
         }
 
         /// <summary>
-        /// Reset the elapsed game time to <see cref="TimeSpan.Zero"/>.
+        /// Resets the elapsed game time to <see cref="TimeSpan.Zero"/>.
         /// </summary>
         public void ResetElapsedTime() {
             if (gameTimer != null) {
@@ -134,9 +143,11 @@ namespace Peanut.Libs.Game {
         }
 
         /// <summary>
-        /// Run the game.
+        /// Runs the game.<br/>
         /// </summary>
-        /// <param name="runBehavior">Indicate if the game should be run synchronously or asynchronously.</param>
+        /// <param name="runBehavior">
+        ///     Indicate if the game should be run synchronously or asynchronously.
+        /// </param>
         public void Run(GameRunBehavior runBehavior) {
             switch (runBehavior) {
                 case GameRunBehavior.Asynchronous:
@@ -179,8 +190,8 @@ namespace Peanut.Libs.Game {
         // modes across multiple devices and platforms.
 
         RetryTick:
-            if (!IsActive && (InactiveSleepTime.TotalMilliseconds >= 1.0)) {
-                System.Threading.Thread.Sleep((int)InactiveSleepTime.TotalMilliseconds);
+            if (!isActive && (inactiveSleepTime.TotalMilliseconds >= 1.0)) {
+                System.Threading.Thread.Sleep((int)inactiveSleepTime.TotalMilliseconds);
             }
 #nullable disable
             long currentTicks = gameTimer.Elapsed.Ticks;
@@ -189,9 +200,9 @@ namespace Peanut.Libs.Game {
             
             previousTicks = currentTicks;
 
-            if (IsFixedTimeStep && accumulatedElapsedTime < TargetElapsedTime) {
+            if (isFixedTimeStep && accumulatedElapsedTime < targetElapsedTime) {
                 // Sleep for as long as possible without overshooting the update time
-                double sleepTime = (TargetElapsedTime - accumulatedElapsedTime).TotalMilliseconds;
+                double sleepTime = (targetElapsedTime - accumulatedElapsedTime).TotalMilliseconds;
                 TimerHelper.SleepForNoMoreThan(sleepTime);
                 // Keep looping until it's time to perform the next update
                 goto RetryTick;
@@ -202,14 +213,14 @@ namespace Peanut.Libs.Game {
                 accumulatedElapsedTime = maxElapsedTime;
             }
 
-            if (IsFixedTimeStep) {
-                gameTime.ElapsedGameTime = TargetElapsedTime;
+            if (isFixedTimeStep) {
+                gameTime.ElapsedGameTime = targetElapsedTime;
                 int stepCount = 0;
 
                 // Perform as many full fixed length time steps as we can.
-                while (accumulatedElapsedTime >= TargetElapsedTime && !shouldExit) {
-                    gameTime.TotalGameTime += TargetElapsedTime;
-                    accumulatedElapsedTime -= TargetElapsedTime;
+                while (accumulatedElapsedTime >= targetElapsedTime && !shouldExit) {
+                    gameTime.TotalGameTime += targetElapsedTime;
+                    accumulatedElapsedTime -= targetElapsedTime;
                     ++stepCount;
 
                     Update(gameTime);
@@ -237,7 +248,7 @@ namespace Peanut.Libs.Game {
 
                 // Draw needs to know the total elapsed time
                 // that occured for the fixed length updates.
-                gameTime.ElapsedGameTime = TimeSpan.FromTicks(TargetElapsedTime.Ticks * stepCount);
+                gameTime.ElapsedGameTime = TimeSpan.FromTicks(targetElapsedTime.Ticks * stepCount);
             }
             else {
                 // Perform a single variable length update.
