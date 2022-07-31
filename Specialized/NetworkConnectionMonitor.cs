@@ -78,8 +78,8 @@ namespace Peanut.Libs.Specialized {
         /// <param name="hostNameOrAddress">
         ///     The url or ip address used to check internet connectivity.
         /// </param>
-        /// <param name="timeout">the timeout for each ping (in milliseconds) against the
-        ///     url or ip address.
+        /// <param name="timeout">
+        ///     The timeout for each ping (in milliseconds) against the url or ip address.
         /// </param>
         public NetworkConnectionMonitor(string hostNameOrAddress, int timeout) :
             this(hostNameOrAddress) {
