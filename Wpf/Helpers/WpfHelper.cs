@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace Peanut.Libs.Wpf.Helpers {
@@ -92,14 +93,20 @@ namespace Peanut.Libs.Wpf.Helpers {
         /// <returns>The found parent. <see langword="null"/> if no such parent was found.</returns>
         public static T? FindVisualParent<T>(this DependencyObject child) where T : DependencyObject {
             // get parent item
-            DependencyObject? parent = VisualTreeHelper.GetParent(child);
+            DependencyObject? parent = null;
+            if (child is Run run) {
+                parent = run.Parent;
+            }
+            else {
+                VisualTreeHelper.GetParent(child);
+            }
 
-            // we’ve reached the end of the tree
+            // we've reached the end of the tree
             if (parent == null) {
                 return null;
             }
 
-            // check if the parent matches the type we’re looking for
+            // check if the parent matches the type we're looking for
             if (parent is T tParent) {
                 return tParent;
             }
