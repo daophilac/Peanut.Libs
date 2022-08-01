@@ -3,8 +3,8 @@ using System.Windows;
 
 namespace Peanut.Libs.Wpf {
     /// <summary>
-    /// A subclass of the <see cref="Application"/> class that provides machenism for making
-    /// MVVM application.<br/>
+    /// A subclass of the <see cref="Application"/> class that provides mechanisms for making
+    /// MVVM applications.<br/>
     /// </summary>
     public abstract class PeanutApplication : Application {
         /// <summary>

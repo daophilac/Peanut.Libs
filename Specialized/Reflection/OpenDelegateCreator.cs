@@ -115,7 +115,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// This is another version of the
         /// <see cref="CreateInstanceReturn{TTarget, TReturn}(MethodInfo)"/> method
-        /// method which is helpful when we do not know ahead of time what the target type is
+        /// which is helpful when we do not know ahead of time what the target type is
         /// and we cannot use the generic method. However, this method still requires that
         /// we do know ahead of time the return type.<br/>
         /// </summary>
