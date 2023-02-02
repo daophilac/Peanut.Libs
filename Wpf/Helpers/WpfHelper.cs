@@ -98,7 +98,7 @@ namespace Peanut.Libs.Wpf.Helpers {
                 parent = run.Parent;
             }
             else {
-                VisualTreeHelper.GetParent(child);
+                parent = VisualTreeHelper.GetParent(child);
             }
 
             // we've reached the end of the tree
