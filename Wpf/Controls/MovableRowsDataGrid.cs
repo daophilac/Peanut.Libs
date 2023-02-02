@@ -39,8 +39,8 @@ namespace Peanut.Libs.Wpf.Controls {
             }
             set {
                 lock (locker) {
-                    // If the value is false, we don't care about anything,
-                    // we will just set the property to false and unregister event handlers.
+                    // If the value is false, we don't care anything.
+                    // We will just set the property to false and unregister event handlers.
                     if (!value) {
                         enableRowsMove = false;
                         isDragging = false;
@@ -55,7 +55,7 @@ namespace Peanut.Libs.Wpf.Controls {
                     // inherits from at least IList.
                     // But we cannot do that in a simple way due to the fact that user code can
                     // assign this property to true in design time. And when the control gets
-                    // initialized, the ItemsSource property would be null.
+                    // initialized, the ItemsSource property will be null.
                     // So, in case the ItemsSource property is null, we will just assign true.
                     // Then we have to catch the ItemsSourceChanged event to validate the
                     // ItemsSource property again.
