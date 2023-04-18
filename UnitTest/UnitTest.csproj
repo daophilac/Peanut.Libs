@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SpecializedTests\**" />
+    <EmbeddedResource Remove="SpecializedTests\**" />
+    <None Remove="SpecializedTests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ICSharpCode.Decompiler" Version="7.1.0.6543" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="NUnit" Version="3.13.1" />
@@ -18,10 +24,6 @@
     <ProjectReference Include="..\Abstraction\Abstraction.csproj" />
     <ProjectReference Include="..\Game\Game.csproj" />
     <ProjectReference Include="..\Specialized\Specialized.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SpecializedTests\" />
   </ItemGroup>
 
 </Project>

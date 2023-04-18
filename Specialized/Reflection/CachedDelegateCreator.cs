@@ -3,12 +3,12 @@ using System.Reflection;
 
 namespace Peanut.Libs.Specialized.Reflection {
     /// <summary>
-    /// Helps creating open delegates for high performance method invocation.<br/>
-    /// Open delegates do not root the target object so the object can be garbage collected.<br/>
+    /// Helps creating cached delegates for high performance method invocation.<br/>
+    /// Cached delegates do not root the target object so the object can be garbage collected.<br/>
     /// </summary>
-    public static class OpenDelegateCreator {
+    public static class CachedDelegateCreator {
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be a static method.<br/>
         /// </summary>
@@ -20,7 +20,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// </summary>
@@ -36,7 +36,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// This is another version of the <see cref="CreateInstanceVoid{TTarget}(MethodInfo)"/>
@@ -49,7 +49,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         public static Action<object> CreateInstanceVoid(this MethodInfo method, Type targetType) {
             targetType.AssertTargetIsClass(true);
 #nullable disable
-            MethodInfo genericMethod = typeof(OpenDelegateCreator).GetMethod(
+            MethodInfo genericMethod = typeof(CachedDelegateCreator).GetMethod(
                 nameof(BoxCreateInstanceVoid), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo constructedGenericMethod = genericMethod.MakeGenericMethod(targetType);
             object @delegate = constructedGenericMethod.Invoke(null, new object[] { method });
@@ -79,7 +79,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be a static method.<br/>
         /// </summary>
@@ -92,7 +92,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// </summary>
@@ -110,7 +110,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that has no parameters and
+        /// Creates a cached delegate which represents a method that has no parameters and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// This is another version of the
@@ -127,7 +127,7 @@ namespace Peanut.Libs.Specialized.Reflection {
             this MethodInfo method, Type targetType) {
             targetType.AssertTargetIsClass(true);
 #nullable disable
-            MethodInfo genericMethod = typeof(OpenDelegateCreator).GetMethod(
+            MethodInfo genericMethod = typeof(CachedDelegateCreator).GetMethod(
                 nameof(BoxCreateInstanceReturn), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo constructedGenericMethod =
                 genericMethod.MakeGenericMethod(targetType, typeof(TReturn));
@@ -139,8 +139,8 @@ namespace Peanut.Libs.Specialized.Reflection {
         /// <summary>
         /// Helper method for <see cref="CreateInstanceReturn{TReturn}(MethodInfo, Type)"/>.<br/>
         /// This method will take the strongly typed delegate from the
-        /// <see cref="CreateInstanceReturn{TTarget, TReturn}(MethodInfo)"/> method and turn it into
-        /// a weakly typed delegate.<br/>
+        /// <see cref="CreateInstanceReturn{TTarget, TReturn}(MethodInfo)"/> method and turn it
+        /// into a weakly typed delegate.<br/>
         /// This method is meant to be invoked via reflection because it still has type
         /// parameters.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
@@ -171,7 +171,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         // 8. A healper method to create the weakly typed delegate.
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be a static method.<br/>
         /// </summary>
@@ -186,7 +186,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// </summary>
@@ -206,7 +206,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns void.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// This is another version of the
@@ -224,7 +224,7 @@ namespace Peanut.Libs.Specialized.Reflection {
             this MethodInfo method, Type targetType) {
             targetType.AssertTargetIsClass(true);
 #nullable disable
-            MethodInfo genericMethod = typeof(OpenDelegateCreator).GetMethod(
+            MethodInfo genericMethod = typeof(CachedDelegateCreator).GetMethod(
                 nameof(BoxCreateInstanceVoidParam), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo constructedGenericMethod =
                 genericMethod.MakeGenericMethod(targetType, typeof(TParam));
@@ -257,7 +257,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be a static method.<br/>
         /// </summary>
@@ -266,14 +266,15 @@ namespace Peanut.Libs.Specialized.Reflection {
         /// <param name="method">The method to which we create the delegate on.</param>
         /// <returns>The delegate for the <paramref name="method"/>.</returns>
         // 5. A strongly typed delegate for static method that returns a value.
-        public static Func<TParam, TReturn> CreateStaticReturnParam<TParam, TReturn>(this MethodInfo method) {
+        public static Func<TParam, TReturn>CreateStaticReturnParam<TParam, TReturn>(
+            this MethodInfo method) {
             method.AssertStaticReturnParameters(true, typeof(TReturn), 1);
             method.GetParameters()[0].AssertParameterType(typeof(TParam));
             return (Func<TParam, TReturn>)method.CreateDelegate(typeof(Func<TParam, TReturn>));
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// </summary>
@@ -285,8 +286,8 @@ namespace Peanut.Libs.Specialized.Reflection {
         /// <param name="method">The method to which we create the delegate on.</param>
         /// <returns>The delegate for the <paramref name="method"/>.</returns>
         // 6. A strongly typed delegate for an instance method that returns a value.
-        public static Func<TTarget, TParam, TReturn> CreateInstanceReturnParam<TTarget, TParam, TReturn>(
-            this MethodInfo method) where TTarget : class {
+        public static Func<TTarget, TParam, TReturn> CreateInstanceReturnParam<TTarget, TParam,
+            TReturn>(this MethodInfo method) where TTarget : class {
             method.AssertStaticReturnParameters(false, typeof(TReturn), 1);
             method.GetParameters()[0].AssertParameterType(typeof(TParam));
             return (Func<TTarget, TParam, TReturn>)method.CreateDelegate(
@@ -294,7 +295,7 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Creates an open delegate which represents a method that requires 1 parameter and
+        /// Creates a cached delegate which represents a method that requires 1 parameter and
         /// returns <typeparamref name="TReturn"/>.<br/>
         /// The <paramref name="method"/> needs to be an instance method.<br/>
         /// This is another version of the
@@ -313,7 +314,7 @@ namespace Peanut.Libs.Specialized.Reflection {
             this MethodInfo method, Type targetType) {
             targetType.AssertTargetIsClass(true);
 #nullable disable
-            MethodInfo genericMethod = typeof(OpenDelegateCreator).GetMethod(
+            MethodInfo genericMethod = typeof(CachedDelegateCreator).GetMethod(
                 nameof(BoxCreateInstanceReturnParam), BindingFlags.Static | BindingFlags.NonPublic);
             MethodInfo constructedGenericMethod =
                 genericMethod.MakeGenericMethod(targetType, typeof(TParam), typeof(TReturn));
@@ -350,7 +351,8 @@ namespace Peanut.Libs.Specialized.Reflection {
         #endregion
 
         /// <summary>
-        /// Asserts if the <paramref name="method"/>'s IsStatic property has the desired value.<br/>
+        /// Asserts if the <paramref name="method"/>'s IsStatic property has the desired
+        /// value.<br/>
         /// </summary>
         /// <param name="method">The method to be checked.</param>
         /// <param name="expected">The desired value.</param>
@@ -385,14 +387,15 @@ namespace Peanut.Libs.Specialized.Reflection {
                         "return type was provided.");
                 }
                 else if (!expected.IsAssignableFrom(reality)) {
-                    throw new ArgumentException("The return type of the specified method and the " +
-                        "provided return typed are not compatible.");
+                    throw new ArgumentException("The return type of the specified method and " +
+                        "the provided return typed are not compatible.");
                 }
             }
         }
 
         /// <summary>
-        /// Asserts if the <paramref name="method"/> requires the expected amount of parameters.<br/>
+        /// Asserts if the <paramref name="method"/> requires the expected amount of
+        /// parameters.<br/>
         /// </summary>
         /// <param name="method">The method to be checked.</param>
         /// <param name="expected">The desired value.</param>
@@ -448,9 +451,11 @@ namespace Peanut.Libs.Specialized.Reflection {
         }
 
         /// <summary>
-        /// Asserts if the <paramref name="method"/>'s IsStatic property has the desired value.<br/>
+        /// Asserts if the <paramref name="method"/>'s IsStatic property has the desired
+        /// value.<br/>
         /// Asserts if the <paramref name="method"/> has a desired return type.<br/>
-        /// Asserts if the <paramref name="method"/> requires the expected amount of parameters.<br/>
+        /// Asserts if the <paramref name="method"/> requires the expected amount of
+        /// parameters.<br/>
         /// This method internally calls the <see cref="AssertStatic(MethodInfo, bool)"/>,
         /// <see cref="AssertReturn(MethodInfo, Type)"/> and the
         /// <see cref="AssertParametersCount(MethodInfo, int)"/> methods.<br/>
