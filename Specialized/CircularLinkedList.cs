@@ -56,11 +56,36 @@ namespace Peanut.Libs.Specialized {
         }
 
         /// <summary>
+        /// Fills all the nodes with values created from a creator.<br/>
+        /// </summary>
+        /// <param name="creator"></param>
+        public void FillWith(Func<T> creator) {
+            foreach (CircularLinkedListNode<T> node in nodes) {
+                node.Value = creator();
+            }
+        }
+
+        /// <summary>
+        /// Sets the current node to the next node.
+        /// </summary>
+        public void Forward() {
+            Current = Current.Next;
+        }
+
+        /// <summary>
+        /// Sets the current node to the previous node.
+        /// </summary>
+        public void Backward() {
+            Current = Current.Previous;
+        }
+        
+
+        /// <summary>
         /// Sets value for the next node and also advance the current node to the next node.<br/>
         /// </summary>
         /// <param name="value">The value being set.</param>
         public void SetNextAndAdvance(T value) {
-            Current = Current.Next;
+            Forward();
             Current.Value = value;
         }
 
@@ -70,7 +95,7 @@ namespace Peanut.Libs.Specialized {
         /// </summary>
         /// <param name="value">The value being set.</param>
         public void SetPreviousAndAdvance(T value) {
-            Current = Current.Previous;
+            Backward();
             Current.Value = value;
         }
 
