@@ -82,6 +82,14 @@ namespace Peanut.Libs.Specialized {
             linkedList.Remove(node);
         }
 
+        /// <summary>
+        /// Removes all items from the collection.<br/>
+        /// </summary>
+        public void Clear() {
+            dictionary.Clear();
+            linkedList.Clear();
+        }
+
         /// <inheritdoc/>
         public IEnumerator<T> GetEnumerator() {
             return linkedList.GetEnumerator();
