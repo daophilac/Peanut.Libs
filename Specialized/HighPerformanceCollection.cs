@@ -7,7 +7,7 @@ namespace Peanut.Libs.Specialized {
     /// Duplicate items are not allowed.<br/>
     /// </summary>
     /// <typeparam name="T">Type of items of the collection.</typeparam>
-    public class HighPerformaneCollection<T> : IEnumerable<T> where T : notnull {
+    public class HighPerformanceCollection<T> : IEnumerable<T> where T : notnull {
         private readonly LinkedList<T> linkedList = new();
         private readonly Dictionary<T, LinkedListNode<T>> dictionary = new();
 
@@ -17,16 +17,16 @@ namespace Peanut.Libs.Specialized {
         public int Count => linkedList.Count;
 
         /// <summary>
-        /// Determines whether the <see cref="HighPerformaneCollection{T}"/> contains the specified
+        /// Determines whether the <see cref="HighPerformanceCollection{T}"/> contains the specified
         /// key.<br/>
         /// </summary>
         /// <param name="value">
-        ///     The value to locate in the <see cref="HighPerformaneCollection{T}"/>.
+        ///     The value to locate in the <see cref="HighPerformanceCollection{T}"/>.
         ///     The value cannot be null.
         /// </param>
         /// <returns>
         ///     <see langword="true"/> if <paramref name="value"/> is found in the
-        ///     <see cref="HighPerformaneCollection{T}"/>; otherwise, <see langword="false"/>.
+        ///     <see cref="HighPerformanceCollection{T}"/>; otherwise, <see langword="false"/>.
         /// </returns>
         public bool Contains(T value) {
             return dictionary.ContainsKey(value);
