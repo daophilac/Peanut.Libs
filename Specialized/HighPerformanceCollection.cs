@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Peanut.Libs.Specialized {
     /// <summary>
-    /// A high performance collection that has constant lookup and insert time.<br/>
+    /// A high performance collection that has constant lookup, insert and removal time.<br/>
     /// Duplicate items are not allowed.<br/>
     /// </summary>
     /// <typeparam name="T">Type of items of the collection.</typeparam>
