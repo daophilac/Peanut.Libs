@@ -17,9 +17,7 @@ namespace Peanut.Libs.Specialized {
         ///     An implementation/subclass of <typeparamref name="TSource"/>.
         /// </typeparam>
         /// <returns>The current object. This helps registering multiple types simpler.</returns>
-        IContainerRegister Register<TSource, TImplementation>()
-            where TSource : class
-            where TImplementation : class;
+        IContainerRegister Register<TSource, TImplementation>() where TImplementation : TSource;
 
         /// <summary>
         /// Register a singleton type implementation.<br/>
@@ -29,9 +27,7 @@ namespace Peanut.Libs.Specialized {
         ///     An implementation/subclass of <typeparamref name="TSource"/>.
         /// </typeparam>
         /// <returns>The current object. This helps registering multiple types simpler.</returns>
-        IContainerRegister RegisterSingleton<TSource, TImplementation>()
-            where TSource : class
-            where TImplementation : class;
+        IContainerRegister RegisterSingleton<TSource, TImplementation>() where TImplementation : TSource;
 
         /// <summary>
         /// Register a singleton type implementation but allow user code to give the object.<br/>
@@ -43,8 +39,7 @@ namespace Peanut.Libs.Specialized {
         /// <param name="value">The singleton object.</param>
         /// <returns>The current object. This helps registering multiple types simpler.</returns>
         IContainerRegister RegisterSingleton<TSource, TImplementation>(TImplementation value)
-            where TSource : class
-            where TImplementation : class, TSource;
+            where TImplementation : TSource;
 
         /// <summary>
         /// Unregister a type from the dependency container.<br/>
@@ -53,7 +48,7 @@ namespace Peanut.Libs.Specialized {
         /// <returns>
         ///     True if source type is successfully unregistered. Otherwise, false.
         /// </returns>
-        bool Unregister<TSource>() where TSource : class;
+        bool Unregister<TSource>();
     }
 
     /// <summary>
@@ -67,7 +62,7 @@ namespace Peanut.Libs.Specialized {
         /// <returns>
         ///     An implementation/subclass instance of the type <typeparamref name="TSource"/>.
         /// </returns>
-        TSource Resolve<TSource>() where TSource : class;
+        TSource Resolve<TSource>();
 
         /// <summary>
         /// Determine whether the container can resolve the <typeparamref name="TSource"/> type.<br/>
@@ -77,7 +72,7 @@ namespace Peanut.Libs.Specialized {
         ///     True if the container can resolve the <typeparamref name="TSource"/> type.
         ///     Otherwise, false.
         /// </returns>
-        bool CanResolve<TSource>() where TSource : class;
+        bool CanResolve<TSource>();
 
         /// <summary>
         /// Creates an instance with the provided type.<br/>
@@ -85,7 +80,7 @@ namespace Peanut.Libs.Specialized {
         /// </summary>
         /// <typeparam name="T">The source type.</typeparam>
         /// <returns>An instance of the type <typeparamref name="T"/>.</returns>
-        T CreateInstance<T>() where T : class;
+        T CreateInstance<T>();
     }
 
     /// <summary>
@@ -94,32 +89,26 @@ namespace Peanut.Libs.Specialized {
     /// </summary>
     public abstract class DependencyContainerBase : IContainerRegister, IContainerResolver {
         /// <inheritdoc/>
-        public abstract IContainerRegister Register<TSource, TImplementation>()
-            where TSource : class
-            where TImplementation : class;
+        public abstract IContainerRegister Register<TSource, TImplementation>() where TImplementation : TSource;
 
         /// <inheritdoc/>
-        public abstract IContainerRegister RegisterSingleton<TSource, TImplementation>()
-            where TSource : class
-            where TImplementation : class;
+        public abstract IContainerRegister RegisterSingleton<TSource, TImplementation>() where TImplementation : TSource;
 
         /// <inheritdoc/>
         public abstract IContainerRegister RegisterSingleton<TSource, TImplementation>(
-            TImplementation value)
-            where TSource : class
-            where TImplementation : class, TSource;
+            TImplementation value) where TImplementation : TSource;
 
         /// <inheritdoc/>
-        public abstract bool Unregister<TSource>() where TSource : class;
+        public abstract bool Unregister<TSource>();
 
         /// <inheritdoc/>
-        public abstract TSource Resolve<TSource>() where TSource : class;
+        public abstract TSource Resolve<TSource>();
 
         /// <inheritdoc/>
-        public abstract bool CanResolve<TSource>() where TSource : class;
+        public abstract bool CanResolve<TSource>();
 
         /// <inheritdoc/>
-        public abstract T CreateInstance<T>() where T : class;
+        public abstract T CreateInstance<T>();
     }
 
     /// <summary>
