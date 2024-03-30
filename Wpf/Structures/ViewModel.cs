@@ -173,4 +173,29 @@ namespace Peanut.Libs.Wpf {
             Service = PeanutApplication.ContainerResolver.Resolve<TService>();
         }
     }
+
+    /// <summary>
+    /// A subclass of the <see cref="ViewModel{TModel, TService}"/> class that has 2 injected services.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <typeparam name="TService1">The type of the first service.</typeparam>
+    /// <typeparam name="TService2">The type of the second service.</typeparam>
+    public abstract class ViewModel<TModel, TService1, TService2> : ViewModel<TModel, TService1>
+        where TModel : IModel
+        where TService1 : IService
+        where TService2 : IService {
+
+        /// <summary>
+        /// Gets the 2nd injected service.
+        /// </summary>
+        protected TService2 Service2 { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ViewModel{TModel, TService1, TService2}"/> class.
+        /// </summary>
+        /// <param name="model">The model</param>
+        protected ViewModel(TModel model) : base(model) {
+            Service2 = PeanutApplication.ContainerResolver.Resolve<TService2>();
+        }
+    }
 }
