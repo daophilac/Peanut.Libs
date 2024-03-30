@@ -20,10 +20,12 @@ namespace Peanut.Libs.OS {
         public string ApplicationName { get; private set; }
 #nullable enable
 
+#nullable disable
         /// <summary>
         /// Gets the executable path of the application.
         /// </summary>
-        public string? ApplicationPath { get; private set; }
+        public string ApplicationPath { get; private set; }
+#nullable enable
 
         /// <summary>
         /// Gets the list of found large icons.
