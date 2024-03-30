@@ -8,6 +8,25 @@ namespace Peanut.Libs.Wpf {
     /// Implementation of <see cref="INotifyPropertyChanged"/> to simplify models.
     /// </summary>
     public abstract class BindableBase : INotifyPropertyChanged {
+        private readonly object? sender;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BindableBase"/> class.
+        /// </summary>
+        protected BindableBase() {
+            sender = this;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BindableBase"/> class with a specified sender.<br/>
+        /// The sender will be used whenever a property change event needs to be fired.
+        /// If sender is <see langword="null"/> then <see langword="this"/> will be used instead.
+        /// </summary>
+        /// <param name="sender"></param>
+        protected BindableBase(object? sender) {
+            this.sender = sender ?? this;
+        }
+
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
@@ -72,7 +91,7 @@ namespace Peanut.Libs.Wpf {
         /// </summary>
         /// <param name="args">The PropertyChangedEventArgs</param>
         protected virtual void OnPropertyChanged(PropertyChangedEventArgs args) {
-            PropertyChanged?.Invoke(this, args);
+            PropertyChanged?.Invoke(sender, args);
         }
     }
 }

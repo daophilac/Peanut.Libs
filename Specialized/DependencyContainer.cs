@@ -164,7 +164,9 @@ namespace Peanut.Libs.Specialized {
             lock (locker) {
                 Register<TSource, TImplementation>();
                 Type type = typeof(TSource);
+#nullable disable
                 singletons.Add(type, value);
+#nullable enable
                 return this;
             }
         }

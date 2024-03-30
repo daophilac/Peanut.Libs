@@ -40,6 +40,13 @@ namespace Peanut.Libs.Wpf {
         }
 
         /// <summary>
+        /// Dispose all the disposable currently managed by <see cref="DisposableManager"/>.
+        /// </summary>
+        public void Dispose() {
+            DisposableManager.DisposeAllAndClear();
+        }
+
+        /// <summary>
         /// Registers dependencies.<br/>
         /// </summary>
         /// <param name="container">

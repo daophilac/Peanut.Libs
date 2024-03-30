@@ -5,21 +5,16 @@ namespace Peanut.Libs.Wpf {
     /// A subclass of the <see cref="BindableBase"/> class that implements
     /// <see cref="IEditableObject"/> to enable rollback machenism.<br/>
     /// </summary>
-    public abstract class EditableBase : BindableBase, IEditableObject {
+    public abstract class EditableBase<T> : IEditableObject {
         /// <summary>
         /// Gets a value indicating whether this object is in edit mode.<br/>
         /// </summary>
         public bool InEdit { get; private set; }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EditableBase"/> class.<br/>
-        /// </summary>
-        public EditableBase() {
-            backupCopy = (EditableBase)MemberwiseClone();
-        }
-
         #region IEditableObject implementation
-        private EditableBase backupCopy;
+#nullable disable
+        private T backupCopy;
+#nullable enable
 
         /// <summary>
         /// Begins editing the object.<br/>
@@ -30,7 +25,7 @@ namespace Peanut.Libs.Wpf {
                 return;
             }
             InEdit = true;
-            backupCopy = (EditableBase)MemberwiseClone();
+            backupCopy = Clone();
             BeginEdit(backupCopy);
         }
 
@@ -63,18 +58,25 @@ namespace Peanut.Libs.Wpf {
         /// Occurs when the object begins editing.<br/>
         /// </summary>
         /// <param name="snapshot">The snapshot of the object before it enters edit mode.</param>
-        protected virtual void BeginEdit(EditableBase snapshot) { }
+        protected virtual void BeginEdit(T snapshot) { }
 
         /// <summary>
         /// Occurs when the object cancels editing.<br/>
         /// </summary>
         /// <param name="snapshot">The snapshot of the object before it enters edit mode.</param>
-        protected virtual void CancelEdit(EditableBase snapshot) { }
+        protected virtual void CancelEdit(T snapshot) { }
 
         /// <summary>
         /// Occurs when the object ends editing.<br/>
         /// </summary>
         /// <param name="snapshot">The snapshot of the object before it enters edit mode.</param>
-        protected virtual void EndEdit(EditableBase snapshot) { }
+        protected virtual void EndEdit(T snapshot) { }
+
+        /// <summary>
+        /// Clones the current editing object.<br/>
+        /// This method will be called when the object enters edit mode.
+        /// </summary>
+        /// <returns>The cloned object.</returns>
+        protected abstract T Clone();
     }
 }
