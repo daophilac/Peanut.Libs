@@ -7,6 +7,7 @@
     <AssemblyName>Peanut.Libs.OS</AssemblyName>
     <RootNamespace>Peanut.Libs.OS</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
