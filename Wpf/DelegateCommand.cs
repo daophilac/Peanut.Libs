@@ -121,12 +121,12 @@ namespace Peanut.Libs.Wpf {
         }
 
         /// <inheritdoc/>
-        public void Execute(object? parameter) {
+        public virtual void Execute(object? parameter) {
             executeStrategy?.Execute(parameter);
         }
 
         /// <inheritdoc/>
-        public bool CanExecute(object? parameter) {
+        public virtual bool CanExecute(object? parameter) {
             return canExecuteStrategy != null && canExecuteStrategy.CanExecute(parameter);
         }
     }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Abstraction\Abstraction.csproj" />
     <ProjectReference Include="..\Game\Game.csproj" />
+    <ProjectReference Include="..\OS\OS.csproj" />
     <ProjectReference Include="..\Specialized\Specialized.csproj" />
   </ItemGroup>
 
