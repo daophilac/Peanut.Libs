@@ -76,10 +76,13 @@ namespace Peanut.Libs.Specialized {
         /// Removes an item from the collection.<br/>
         /// </summary>
         /// <param name="value">The item to be removed.</param>
-        public void Remove(T value) {
-            LinkedListNode<T> node = dictionary[value];
-            dictionary.Remove(value);
-            linkedList.Remove(node);
+        public bool Remove(T value) {
+            if (dictionary.TryGetValue(value, out LinkedListNode<T>? node)) {
+                dictionary.Remove(value);
+                linkedList.Remove(node);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
