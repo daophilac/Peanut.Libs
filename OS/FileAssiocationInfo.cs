@@ -115,7 +115,7 @@ namespace Peanut.Libs.OS {
 
         private static void ProcessValue(FileAssiocationInfo info, RegistryKey key, string valueName) {
             string? value  = key.GetValue(valueName) as string;
-            if (value == null) {
+            if (value == null || value.ToLower().EndsWith(".ico")) {
                 return;
             }
             switch (valueName) {
