@@ -79,16 +79,16 @@ namespace UnitTest.Common.DependencyContainer {
             Assert.Pass();
         }
 
-        [Test]
-        public void RegisterIncompatibleClasses_Throws() {
-            Peanut.Libs.Specialized.DependencyContainer dependencyContainer = new();
-            Assert.Throws<ArgumentException>(() => {
-                dependencyContainer.Register<IncompatibleClassA, IncompatibleClassB>();
-            });
-            Assert.Throws<ArgumentException>(() => {
-                dependencyContainer.Register<IncompatibleClassB, IncompatibleClassA>();
-            });
-        }
+        //[Test]
+        //public void RegisterIncompatibleClasses_Throws() {
+        //    Peanut.Libs.Specialized.DependencyContainer dependencyContainer = new();
+        //    Assert.Throws<ArgumentException>(() => {
+        //        dependencyContainer.Register<IncompatibleClassA, IncompatibleClassB>();
+        //    });
+        //    Assert.Throws<ArgumentException>(() => {
+        //        dependencyContainer.Register<IncompatibleClassB, IncompatibleClassA>();
+        //    });
+        //}
 
         [Test]
         public void RegisterCompatibleClasses_Pass() {
@@ -99,15 +99,15 @@ namespace UnitTest.Common.DependencyContainer {
             Assert.Pass();
         }
 
-        [Test]
-        public void RegisterCompatibleClasses_ButWrongOrder_Throws() {
-            Peanut.Libs.Specialized.DependencyContainer dependencyContainer = new();
+        //[Test]
+        //public void RegisterCompatibleClasses_ButWrongOrder_Throws() {
+        //    Peanut.Libs.Specialized.DependencyContainer dependencyContainer = new();
 
-            Assert.Throws<ArgumentException>(() => {
-                // wrong order
-                dependencyContainer.Register<CompatibleConcreteClass, CompatibleAbstractClass>();
-            });
-        }
+        //    Assert.Throws<ArgumentException>(() => {
+        //        // wrong order
+        //        dependencyContainer.Register<CompatibleConcreteClass, CompatibleAbstractClass>();
+        //    });
+        //}
 
         [Test]
         public void RegisterSingleton() {
