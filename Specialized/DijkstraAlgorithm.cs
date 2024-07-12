@@ -79,8 +79,8 @@ namespace Peanut.Libs.Specialized {
         private void ClearData() {
             _visited.Clear();
             _predecessors.Clear();
-            foreach (KeyValuePair<TNode, float> entry in _distances) {
-                _distances[entry.Key] = float.MaxValue;
+            foreach (TNode key in _distances.Keys) {
+                _distances[key] = float.MaxValue;
             }
         }
 
@@ -122,7 +122,7 @@ namespace Peanut.Libs.Specialized {
     }
 
     /// <summary>
-    /// Class that represent a vertex in the Dijkstra's algorithm.
+    /// Class that represents a vertex in the Dijkstra's algorithm.
     /// </summary>
     public class DijkstraNode { }
 }
