@@ -27,9 +27,7 @@ namespace Peanut.Libs.Specialized {
         /// <param name="capacity">The capacity.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public CircularLinkedList(int capacity) {
-            if (capacity <= 0) {
-                throw new ArgumentOutOfRangeException(nameof(capacity));
-            }
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
             nodes = new CircularLinkedListNode<T>[capacity];
             for (int i = 0; i < capacity; i++) {
                 nodes[i] = new CircularLinkedListNode<T>(this);
@@ -107,7 +105,7 @@ namespace Peanut.Libs.Specialized {
         /// A <see cref="List{T}"/> containing all the <see cref="CircularLinkedListNode{T}"/>.
         /// </returns>
         public List<CircularLinkedListNode<T>> ToListNodes() {
-            return nodes.ToList();
+            return [.. nodes];
         }
 
         /// <summary>
