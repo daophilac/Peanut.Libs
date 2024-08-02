@@ -48,7 +48,7 @@ namespace Peanut.Libs.Game.Utils {
         public double Recalculate(GameTime gameTime) {
             double fps = TimeSpan.FromSeconds(1) / gameTime.ElapsedGameTime;
             fpsList.SetNextAndAdvance(fps);
-            double averageFps = fpsList.ToListValues().Average();
+            double averageFps = fpsList.Values.Average();
             return averageFps;
         }
     }

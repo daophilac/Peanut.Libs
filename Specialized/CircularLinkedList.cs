@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 
 namespace Peanut.Libs.Specialized {
     /// <summary>
@@ -21,6 +21,18 @@ namespace Peanut.Libs.Specialized {
         private readonly CircularLinkedListNode<T>[] nodes;
 
         /// <summary>
+        /// Gets all the nodes in this linked list.<br/>
+        /// </summary>
+        public ReadOnlyCollection<CircularLinkedListNode<T>> Nodes { get; }
+
+        private readonly T[] internalValues;
+
+        /// <summary>
+        /// Get the list containing all values. Do NOT modify this list.<br/>
+        /// </summary>
+        public List<T?> Values { get; }
+
+        /// <summary>
         /// Initializes an instance of the <see cref="CircularLinkedList{T}"/> class with
         /// a capacity.<br/>
         /// </summary>
@@ -29,13 +41,17 @@ namespace Peanut.Libs.Specialized {
         public CircularLinkedList(int capacity) {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
             nodes = new CircularLinkedListNode<T>[capacity];
+            internalValues = new T[capacity];
+            Values = new List<T?>(capacity);
             for (int i = 0; i < capacity; i++) {
-                nodes[i] = new CircularLinkedListNode<T>(this);
+                nodes[i] = new CircularLinkedListNode<T>(this, i);
+                Values.Add(default);
             }
             for (int i = 1; i < capacity - 1; i++) {
                 nodes[i].Previous = nodes[i - 1];
                 nodes[i].Next = nodes[i + 1];
             }
+            Nodes = nodes.AsReadOnly();
             nodes[0].Previous = nodes[capacity - 1];
             nodes[0].Next = nodes[1];
             nodes[capacity - 1].Previous = nodes[capacity - 2];
@@ -48,8 +64,10 @@ namespace Peanut.Libs.Specialized {
         /// </summary>
         /// <param name="value">The value being filled.</param>
         public void FillWith(T value) {
-            foreach (CircularLinkedListNode<T> node in nodes) {
-                node.Value = value;
+            for (int i = 0, count = nodes.Length; i < count; i++) {
+                nodes[i].Value = value;
+                internalValues[i] = value;
+                Values[i] = value;
             }
         }
 
@@ -58,8 +76,11 @@ namespace Peanut.Libs.Specialized {
         /// </summary>
         /// <param name="creator"></param>
         public void FillWith(Func<T> creator) {
-            foreach (CircularLinkedListNode<T> node in nodes) {
-                node.Value = creator();
+            for (int i = 0, count = nodes.Length; i < count; i++) {
+                T value = creator();
+                nodes[i].Value = value;
+                internalValues[i] = value;
+                Values[i] = value;
             }
         }
 
@@ -85,6 +106,8 @@ namespace Peanut.Libs.Specialized {
         public void SetNextAndAdvance(T value) {
             Forward();
             Current.Value = value;
+            internalValues[Current.InternalIndex] = value;
+            Values[Current.InternalIndex] = value;
         }
 
         /// <summary>
@@ -95,25 +118,8 @@ namespace Peanut.Libs.Specialized {
         public void SetPreviousAndAdvance(T value) {
             Backward();
             Current.Value = value;
-        }
-
-        /// <summary>
-        /// Creates a <see cref="List{T}"/> containing all the
-        /// <see cref="CircularLinkedListNode{T}"/>.<br/>
-        /// </summary>
-        /// <returns>
-        /// A <see cref="List{T}"/> containing all the <see cref="CircularLinkedListNode{T}"/>.
-        /// </returns>
-        public List<CircularLinkedListNode<T>> ToListNodes() {
-            return [.. nodes];
-        }
-
-        /// <summary>
-        /// Creates a <see cref="List{T}"/> containing all the values.<br/>
-        /// </summary>
-        /// <returns>A <see cref="List{T}"/> containing all the values.</returns>
-        public List<T?> ToListValues() {
-            return nodes.Select(x => x.Value).ToList();
+            internalValues[Current.InternalIndex] = value;
+            Values[Current.InternalIndex] = value;
         }
     }
 
@@ -122,6 +128,11 @@ namespace Peanut.Libs.Specialized {
     /// </summary>
     /// <typeparam name="T">The type of the items.</typeparam>
     public sealed class CircularLinkedListNode<T> {
+        /// <summary>
+        /// Gets the index of the node in the underlying array.<br/>
+        /// </summary>
+        public int InternalIndex { get; private set; }
+
         /// <summary>
         /// Gets the value of this node.<br/>
         /// </summary>
@@ -146,10 +157,12 @@ namespace Peanut.Libs.Specialized {
         /// Initializes an instance of the <see cref="CircularLinkedListNode{T}"/> class.<br/>
         /// </summary>
         /// <param name="list">The list that contains this node.</param>
+        /// <param name="internalIndex">The index of the node in the underlying array.</param>
 #nullable disable
-        internal CircularLinkedListNode(CircularLinkedList<T> list) {
+        internal CircularLinkedListNode(CircularLinkedList<T> list, int internalIndex) {
 #nullable enable
             List = list;
+            InternalIndex = internalIndex;
         }
 
         /// <summary>
@@ -157,7 +170,8 @@ namespace Peanut.Libs.Specialized {
         /// </summary>
         /// <param name="list">The list that contains this node.</param>
         /// <param name="value">The value of the node.</param>
-        internal CircularLinkedListNode(CircularLinkedList<T> list, T value) : this(list) {
+        /// <param name="internalIndex">The index of the node in the underlying array.</param>
+        internal CircularLinkedListNode(CircularLinkedList<T> list, T value, int internalIndex) : this(list, internalIndex) {
             Value = value;
         }
 
