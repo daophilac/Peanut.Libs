@@ -198,13 +198,12 @@ namespace Peanut.Libs.Specialized {
                 }
             }
             else {
-                int distance = 0;
-                CircularLinkedListNode<T> running = this;
-                while (running != target) {
-                    distance++;
-                    running = running.Next;
+                if (target.InternalIndex > InternalIndex) {
+                    return target.InternalIndex - InternalIndex;
                 }
-                return distance;
+                else {
+                    return List.Count - InternalIndex + target.InternalIndex;
+                }
             }
         }
 
@@ -212,17 +211,17 @@ namespace Peanut.Libs.Specialized {
         /// Calculate the distance between the source and the target node.
         /// The source node will run backward to the target node.<br/>
         /// </summary>
-        /// <param name="other">The target node.</param>
+        /// <param name="target">The target node.</param>
         /// <param name="countZeroDistance">
         ///     Indicates whether the method should return 0 if the source and the target node is
         ///     the same.
         /// </param>
         /// <returns>The distance between the source and the target node.</returns>
-        public int DistanceBackward(CircularLinkedListNode<T> other, bool countZeroDistance = true) {
-            if (List != other.List) {
+        public int DistanceBackward(CircularLinkedListNode<T> target, bool countZeroDistance = true) {
+            if (List != target.List) {
                 throw new Exception("The target node is not in the same list as the source node.");
             }
-            if (this == other) {
+            if (this == target) {
                 if (countZeroDistance) {
                     return 0;
                 }
@@ -231,13 +230,12 @@ namespace Peanut.Libs.Specialized {
                 }
             }
             else {
-                int distance = 0;
-                CircularLinkedListNode<T> running = this;
-                while (running != other) {
-                    distance++;
-                    running = running.Previous;
+                if (target.InternalIndex < InternalIndex) {
+                    return InternalIndex - target.InternalIndex;
                 }
-                return distance;
+                else {
+                    return List.Count - target.InternalIndex + InternalIndex;
+                }
             }
         }
 
