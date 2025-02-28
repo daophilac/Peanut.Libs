@@ -24,7 +24,7 @@ namespace Peanut.Libs.Wpf {
         public T GetEvent<T>() where T : PubSubEventBase, new() {
             Type t = typeof(T);
             if (!registeredTypes.ContainsKey(t)) {
-                registeredTypes.Add(t, Activator.CreateInstance<T>());
+                registeredTypes.Add(t, new T());
             }
             return (T)registeredTypes[t];
         }
